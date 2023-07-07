@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\authController;
+use App\Http\Controllers\Api\postsController;
 use App\Http\Controllers\Api\TagsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,5 +44,11 @@ Route::post('register',[authController::class,'register']);
 
 Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::resource('tags', TagsController::class);
-    // route('products.index', ['manufacturer' => 'Samsung']);
+});
+Route::group(['middleware' => 'auth:sanctum'],function(){
+    Route::get('posts/all',[postsController::class,'all']);
+    Route::resource('posts', postsController::class);
+    Route::get('posts/restore/{post}',[postsController::class,'restore']);
+    
+    
 });
