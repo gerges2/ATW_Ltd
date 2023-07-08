@@ -12,5 +12,6 @@ class posts extends Model
     use HasFactory, Notifiable, SoftDeletes;
     protected $fillable = [
         'title', 'Body', 'image','Pinned','users_id'
-    ];  
+    ];
+    protected $dates = ['deleted_at'];  
 }

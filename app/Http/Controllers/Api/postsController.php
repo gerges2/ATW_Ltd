@@ -4,14 +4,38 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\posts;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
-
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 class postsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+
+
+     public static function test(Request $request)
+     {
+         $date = Carbon::now()->subDays(30);
+        //  $data=posts::onlyTrashed()->get();
+         return 
+        // $date;
+         response( posts::onlyTrashed()
+             ->where('deleted_at', '>', $date)
+             ->forceDelete());
+             
+     }
+     public function stat()
+     {
+        $conutOfUser= User::all()->count();
+        $postcount= posts::all()->count();
+        $usersWithPosts = User::doesntHave('posts')->count();
+        // $usersWithPosts = User::has('posts')->count();
+    return ['number of user'=> $conutOfUser ,'number of posts'=> $postcount,'umber of user have 0 post'=>$usersWithPosts];
+     }
     public function index()
     {
         //
@@ -44,7 +68,7 @@ class postsController extends Controller
                 'image'=>"dada",
                 // 'image'=>$request->image,
                 'Pinned' => $request->Pinned,
-                'users_id'=> auth()->user()->id
+                'user_id'=> auth()->user()->id
             ]
             
         );

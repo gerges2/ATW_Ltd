@@ -47,8 +47,12 @@ Route::group(['middleware' => 'auth:sanctum'],function(){
 });
 Route::group(['middleware' => 'auth:sanctum'],function(){
     Route::get('posts/all',[postsController::class,'all']);
+    Route::get('posts/test',[postsController::class,'test']);
+    Route::get('/stat', [postsController::class, 'stat']);
     Route::resource('posts', postsController::class);
     Route::get('posts/restore/{post}',[postsController::class,'restore']);
+    Route::get('posts/a/{post}',[postsController::class,'restore']);
+    // Route::get('posts/a',[postsController::class,'all2']);
     
     
 });
