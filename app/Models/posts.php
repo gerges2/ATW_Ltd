@@ -11,7 +11,11 @@ class posts extends Model
 {
     use HasFactory, Notifiable, SoftDeletes;
     protected $fillable = [
-        'title', 'Body', 'image','Pinned','users_id'
+        'title', 'Body', 'image','Pinned','user_id'
     ];
     protected $dates = ['deleted_at'];  
+    public function tags()
+    {
+        return $this->hasMany(tags::class);
+    }
 }

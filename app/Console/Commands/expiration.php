@@ -27,10 +27,8 @@ class expiration extends Command
     public function handle()
     {
 
-            
         $date = Carbon::now()->subDays(30);
-         return 
-        
+         return         
          response( posts::onlyTrashed()
              ->where('deleted_at', '>', $date)
              ->forceDelete());

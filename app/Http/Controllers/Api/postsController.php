@@ -17,17 +17,6 @@ class postsController extends Controller
 
 
 
-     public static function test(Request $request)
-     {
-         $date = Carbon::now()->subDays(30);
-        //  $data=posts::onlyTrashed()->get();
-         return 
-        // $date;
-         response( posts::onlyTrashed()
-             ->where('deleted_at', '>', $date)
-             ->forceDelete());
-             
-     }
      public function stat()
      {
         $conutOfUser= User::all()->count();
@@ -39,11 +28,7 @@ class postsController extends Controller
     public function index()
     {
         //
-        $posts= posts::where('users_id', auth()->user()->id)->get();
-        // Flight::where('active', 1)
-            //    ->orderBy('name')
-            //    ->take(10)
-            //    ->get();
+        $posts= posts::where('user_id', auth()->user()->id)->orderBy('Pinned','desc')->get();
         return response($posts);
     }
 
@@ -61,11 +46,19 @@ class postsController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
+
+        if ($request->hasFile('image')) {
+            $destination_path = 'public/images/posts';
+            $image = $request->file('image');
+            $image_name = $image->getClientOriginalName();
+            $path = $request->file('image')->storeAs($destination_path, $image_name);
+            // $book['Image'] = $image_name;
+        }
         $post = posts::create(
             [
                 'title'=>$request->title,
                 'Body'=>$request->Body,
-                'image'=>"dada",
+                'image'=> $image_name,
                 // 'image'=>$request->image,
                 'Pinned' => $request->Pinned,
                 'user_id'=> auth()->user()->id
@@ -75,6 +68,7 @@ class postsController extends Controller
         return response()->json([
             'message' => 'Great success! New tag created',
             'post' => $post
+            // 'post' =>
         ], 201);
         //
     }
@@ -84,11 +78,11 @@ class postsController extends Controller
      */
     public function show(posts $post)
     {
-        if ($post->users_id==auth()->user()->id){
+        if ($post->user_id==auth()->user()->id){
         return response($post);
     }
 else{
-    return response("no data");
+    return response("thies post no belong for you");
 
 }
     }
@@ -114,13 +108,21 @@ else{
         }
 
 
-if($post->users_id==auth()->user()->id){
+if($post->user_id==auth()->user()->id){
+    if ($request->hasFile('image')) {
+        $destination_path = 'public/images/posts';
+        $image = $request->file('image');
+        $image_name = $image->getClientOriginalName();
+        $path = $request->file('image')->storeAs($destination_path, $image_name);
+        // $book['Image'] = $image_name;
+    }else{
+        $image_name=$post->	image;
+    }
     $post->update(
         [
             'title' => $request->title,
             'Body' => $request->Body,
-            'image' => "jj",
-            // 'image' => $img_name,
+            'image' =>  $image_name,
             'Pinned' => $request->Pinned,
         ]
     );
@@ -157,7 +159,8 @@ if($post->users_id==auth()->user()->id){
 
     public function restore($id)
     {
-        $data=posts::withTrashed()->find($id)->restore();
+        $data=posts::withTrashed()->find($id)->where('user_id',auth()->user()->id)->restore();
+        // $data=posts::withTrashed()->find($id)->restore();
   
         return response()->json([
             'message' => 'restore secusses',
@@ -168,7 +171,7 @@ if($post->users_id==auth()->user()->id){
 
     public function all(Request $request)
     {
-        $data=posts::onlyTrashed()->get();
+        $data=posts::onlyTrashed()->where('user_id',auth()->user()->id)->get();
         return response()->json([
             'message' => 'restore secusses',
             'data'=>$data
